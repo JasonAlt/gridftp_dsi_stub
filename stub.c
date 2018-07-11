@@ -36,6 +36,7 @@ stub_start(
     globus_gfs_operation_t      op,
     globus_gfs_session_info_t * session_info)
 {
+
 	stub_handle_t *       stub_handle;
 	globus_gfs_finished_info_t          finished_info;
 	GlobusGFSName(stub_start);
@@ -87,25 +88,25 @@ stub_stat(
     globus_gfs_stat_info_t *            stat_info,
     void *                              user_arg)
 {
-    globus_gfs_stat_t                   stat_array[1];
-    int                                 stat_count = 1;
-    stub_handle_t *       stub_handle;
-    GlobusGFSName(stub_stat);
+	globus_gfs_stat_t                   stat_array[1];
+	int                                 stat_count = 1;
+	stub_handle_t *       stub_handle;
+	GlobusGFSName(stub_stat);
 
-    stub_handle = (stub_handle_t *) user_arg;
+	stub_handle = (stub_handle_t *) user_arg;
 
-    stat_array[0].mode = 0;
-    stat_array[0].nlink = 0;
-    stat_array[0].uid = 0;
-    stat_array[0].gid = 0;
-    stat_array[0].size = 0;
-    stat_array[0].mtime = 0;
-    stat_array[0].atime = 0;
-    stat_array[0].ctime = 0;
-    stat_array[0].dev = 0;
-    stat_array[0].ino = 0;
+	stat_array[0].mode = 0;
+	stat_array[0].nlink = 0;
+	stat_array[0].uid = 0;
+	stat_array[0].gid = 0;
+	stat_array[0].size = 0;
+	stat_array[0].mtime = 0;
+	stat_array[0].atime = 0;
+	stat_array[0].ctime = 0;
+	stat_array[0].dev = 0;
+	stat_array[0].ino = 0;
 
-    globus_gridftp_server_finished_stat(op,
+	globus_gridftp_server_finished_stat(op,
 	                                    GLOBUS_SUCCESS, 
 	                                    stat_array, 
 	                                    stat_count);
@@ -250,8 +251,7 @@ GlobusExtensionDefineModule(globus_gridftp_server_stub) =
 /*
  *  no need to change this
  */
-static
-int
+static int
 stub_activate(void)
 {
 	globus_extension_registry_add(
@@ -270,5 +270,11 @@ static int
 stub_deactivate(void)
 {
 	globus_extension_registry_remove(GLOBUS_GFS_DSI_REGISTRY, "stub");
+	return 0;
+}
+
+int
+main()
+{
 	return 0;
 }
