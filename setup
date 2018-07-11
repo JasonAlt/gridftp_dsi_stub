@@ -1,0 +1,2 @@
+pw_file /etc/passwd
+echo <passwd> | openssl passwd  -salt xyz -stdin
