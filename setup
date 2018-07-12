@@ -1,4 +1,3 @@
-bad_signal_exit 0 # sudo systemctl restart globus-gridftp-server.service
 pw_file /etc/passwd
 echo <passwd> | openssl passwd  -salt xyz -stdin
 
@@ -26,3 +25,21 @@ echo <passwd> | openssl passwd  -salt xyz -stdin
 #  - /usr/lib
 #  - $LD_LIBRARY_PATH in GridFTP config
 #  - ld.so.conf
+
+
+bad_signal_exit 0 # sudo systemctl restart globus-gridftp-server.service
+chdir true
+chdir_to <path>
+
+sudo systemctl edit globus-gridftp-server.service
+[Service]
+LimitCORE=infinity
+
+(/etc/systemd/system/globus-gridftp-server.service.d/override.conf)
+
+/proc/sys/kernel/core_pattern
+
+log_single /var/log/gridftp.log
+log_level ERROR,WARN,ALL
+$GLOBUS_FTP_CONTROL_DEBUG_LEVEL 255
+$GLOBUS_FTP_CONTROL_DEBUG_FILE /var/log/control.log
