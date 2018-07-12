@@ -1,4 +1,13 @@
+#include <stdio.h> // environ
+
 #include "globus_gridftp_server.h"
+
+extern char ** environ;
+
+enum {
+	STUB_CMD_ENV = GLOBUS_GFS_MIN_CUSTOM_CMD,
+};
+
 
 static
 globus_version_t local_version =
@@ -41,13 +50,24 @@ stub_start(
 	globus_gfs_finished_info_t          finished_info;
 	GlobusGFSName(stub_start);
 
+	globus_result_t result = GLOBUS_SUCCESS;
+
+	result = globus_gridftp_server_add_command(op,
+	                                           "env",
+	                                           STUB_CMD_ENV,
+	                                           1,
+	                                           2,
+	                                           "env <sp> [start]",
+	                                           GLOBUS_FALSE,
+	                                           0);
+
 	stub_handle = (stub_handle_t *) globus_malloc(sizeof(stub_handle_t));
 
 	stub_handle->some_needed_data = 0;
 
 	memset(&finished_info, '\0', sizeof(globus_gfs_finished_info_t));
 	finished_info.type = GLOBUS_GFS_OP_SESSION_START;
-	finished_info.result = GLOBUS_SUCCESS;
+	finished_info.result = result;
 	finished_info.info.session.session_arg = stub_handle;
 	finished_info.info.session.username = session_info->username;
 	finished_info.info.session.home_dir = "/";
@@ -138,12 +158,40 @@ stub_command(
     globus_gfs_command_info_t *         cmd_info,
     void *                              user_arg)
 {
-    stub_handle_t *       stub_handle;
-    GlobusGFSName(stub_command);
+	stub_handle_t * stub_handle;
+	GlobusGFSName(stub_command);
 
-    stub_handle = (stub_handle_t *) user_arg;
+	stub_handle = (stub_handle_t *) user_arg;
 
-    globus_gridftp_server_finished_command(op, GLOBUS_SUCCESS, GLOBUS_NULL);
+	char * reply = NULL;
+	switch (cmd_info->command)
+	{
+	case STUB_CMD_ENV:
+		for (int i = 0; environ && environ[i]; i++)
+		{
+			switch (reply != NULL)
+			{
+			case 0:
+				reply = strdup(environ[i]);
+				break;
+			default:
+				reply = realloc(reply, strlen(reply)+strlen(environ[i])+2);
+				strcat(reply, ":");
+				strcat(reply, environ[i]);
+				break;
+			}
+		}
+
+		reply = realloc(reply, strlen(reply) + 3);
+		strcat(reply, "\r\n");
+		break;
+
+	default:
+		break;
+	}
+
+	globus_gridftp_server_finished_command(op, GLOBUS_SUCCESS, reply);
+	free(reply);
 }
 
 /*************************************************************************
