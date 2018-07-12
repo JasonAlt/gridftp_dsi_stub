@@ -1,2 +1,28 @@
+bad_signal_exit 0 # sudo systemctl restart globus-gridftp-server.service
 pw_file /etc/passwd
 echo <passwd> | openssl passwd  -salt xyz -stdin
+
+# If "$ENV VAL" is not present in config at time of fork, child process
+# will not have it, it is not inherited from the parent process.
+
+# Module is loaded before client authenticates. Module start() is called
+# after client supplies credentials. Missing symbol issues are obvious once
+# start() is called.
+
+# Parent GridFTP process does not make use of $LD_LIBRARY_PATH in its config
+# to find modules, only the child process does. SO DON'T USE IT.
+
+# Parent DSI search order:
+#  - /usr/lib64
+#  - /lib64
+#  - /lib
+#  - /usr/lib
+#  - ld.so.conf
+
+# Child DSI search order:
+#  - /usr/lib64
+#  - /lib64
+#  - /lib
+#  - /usr/lib
+#  - $LD_LIBRARY_PATH in GridFTP config
+#  - ld.so.conf
